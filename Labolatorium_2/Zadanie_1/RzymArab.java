@@ -106,8 +106,8 @@ public class RzymArab {
     return odpowiedz;
   }
   /**
-  *Prywatna metoda statyczna zamieniająca liczby rzymskie na arabskie (nie
-  *licząc tych zrobionych przez odejmowanie).
+  *Prywatna metoda statyczna pomocnicza zamieniająca liczby rzymskie na arabskie
+  *(nielicząc tych zrobionych przez odejmowanie).
   *@param String wejscie
   @return Wartość liczby "regularnej", lub -1000 gdy jest błąd.
   */
@@ -123,33 +123,68 @@ public class RzymArab {
   }
 
   /**
-  *Prywatna metoda statyczna sprawdzająca, czy ciąg liclzb jest liczba powstałą
-  *przez odejmowanie dwóch liczb arabskich.
+  *Prywatna metoda statyczna pomocnicza, sprawdzająca ile jest V, L, D w ciągu
+  *znaków.
+  *@param int dlugosc
+  *@param String wejscie
+  *@return true - ciąg nie ma więcej niż po jednej takiej liczbie, false - w
+  *przeciwnym przypadku
+  */
+
+  private static boolean piec (int dlugosc, String wejscie) {
+    int piatki = 0;
+    int piecdziesiatki = 0;
+    int piecsetki = 0;
+    for (int i = 0; i < dlugosc; i++) {
+      if (wejscie.charAt(i) == 'V')
+        piatki++;
+      else if (wejscie.charAt(i) == 'L')
+        piecdziesiatki++;
+      else if (wejscie.charAt(i) == 'D')
+        piecsetki++;
+    }
+    if (piatki > 1 || piecdziesiatki > 1 || piecsetki > 1)
+      return false;
+    return true;
+  }
+
+  /**
+  *Prywatna metoda statyczna pomocnicza sprawdzająca, czy ciąg liclzb jest
+  *liczbą powstałą przez odejmowanie dwóch liczb arabskich. Pięta również, czy
+  *wcześniej nie było takiej liczby rozpoczynającej się od tego samego znaku.
+  *@param boolean[] ograniczenie
   *@param String obecny
   *@param String następny
   *@return Zwraca czy liczba jest zrobiona przez odejmowanie dwóch liczb
   */
 
-  private static boolean rzymOdej(String obecny, String nastepny) {
+  private static boolean rzymOdej(boolean ograniczenie[], String obecny,
+  String nastepny) {
     switch (obecny.charAt(0)) {
       case 'I':
-        if (nastepny.equals("X")) {
+        if (nastepny.equals("X") && ograniczenie[0] == false) {
+          ograniczenie[0] = true;
           return true;
-        } else if (nastepny.equals("V")) {
+        } else if (nastepny.equals("V") && ograniczenie[0] == false) {
+          ograniczenie[0] = true;
           return true;
         }
         break;
       case 'X':
-        if (nastepny.equals("C")) {
+        if (nastepny.equals("C") && ograniczenie[1] == false) {
+          ograniczenie[1] = true;
           return true;
-        } else if (nastepny.equals("L")) {
+        } else if (nastepny.equals("L") && ograniczenie[1] == false) {
+          ograniczenie[1] = true;
           return true;
         }
         break;
       case 'C':
-        if (nastepny.equals("M")) {
+        if (nastepny.equals("M") && ograniczenie[2] == false) {
+          ograniczenie[2] = true;
           return true;
-        } else if (nastepny.equals("D")) {
+        } else if (nastepny.equals("D") && ograniczenie[2] == false) {
+          ograniczenie[2] = true;
           return true;
         }
         break;
@@ -158,8 +193,8 @@ public class RzymArab {
   }
 
   /**
-  *Statyczna metoda prywatna która wzraca, czy dany ciąg znaków jest liczbą
-  *w systemie rzymskim.
+  *Statyczna metoda prywatna pomocnicza która wzraca, czy dany ciąg znaków jest
+  *liczbą w systemie rzymskim.
   *@param int dlugosc
   *@param String wejscie
   @return Zwraca, czy liczba jest w systemie rzymskim
@@ -181,10 +216,13 @@ public class RzymArab {
     /**
     *Stringi zapamiętujące poprzednią literkę i obecną.
     */
+    if (piec(dlugosc, wejscie) == false)
+      return false;
     String ostatni = "";
     String obecny = "";
     boolean dopasowanie = false;
     boolean odpowiedz = true;
+    boolean[] ograniczenie = new boolean[3];
     while (iterator < dlugosc) {
       obecny = String.valueOf(wejscie.charAt(iterator));
       dopasowanie = false;
@@ -208,7 +246,8 @@ public class RzymArab {
             *Sprawdzanie, czy to jest liczba składająca się z dwóch znaków.
             */
             if (dlugosc - iterator > 1 && seria == 1 &&
-            rzymOdej(obecny, String.valueOf(wejscie.charAt(iterator+1)))) {
+            rzymOdej(ograniczenie, obecny,
+            String.valueOf(wejscie.charAt(iterator+1)))) {
               /**
               *Dodatkowe przesiunięcie
               */
@@ -229,9 +268,11 @@ public class RzymArab {
         break;
       }
       /**
-      *SA więcej niż trzy takie same znaki pod rząd.
+      *SA więcej niż trzy takie same znaki pod rząd lub seria 5, 50, 500 jes
+      *większa niż 1.
       */
-      if (seria > 3) {
+      if (seria > 3 || (seria > 1 && (ostatni.equals("D") || ostatni.equals("L")
+      || ostatni.equals("V")))) {
         odpowiedz = false;
         break;
       }

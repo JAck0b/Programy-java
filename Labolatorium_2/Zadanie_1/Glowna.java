@@ -2,6 +2,7 @@
 // Copyright 2018 Jakub Filistyński
 
 /**
+*@author Jakub Filistyński
 *Klasa z metodą główną. Pobiera dane z tablicy Stringów i dla każdego ciągu
 *znaków przelicza go pomiędzy systemem arabskim a rzymskim. Dla błędnych danych
 *wypiduje komunikat.
